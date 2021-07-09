@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.pause.guest.dao.GuestDao">
+
+<select id="getSearchCard" resultType="kr.or.pause.dto.SearchCard">
+select name , capacity, file1, cost , no
+			from host_room
+			where 1 = 1
+			AND addr LIKE '%${param2}%' AND CAPACITY >= '${param1}'
+			and no not in 
+			                (   select no
+			                    from (  select * 
+			                        from option_cal o
+			                        where 1 = 1
+			                        and to_date('${param3}', 'YYYY-MM-DD') between o.date_start and o.date_end
+			                        or to_date('${param4}', 'YYYY-MM-DD') between o.date_start and o.date_end)
+			                    where status like '0')
+</select>
+
+<select id = "getSearchCardByFilter" resultType = "kr.or.pause.dto.SearchCard">
+	
+		SELECT name , capacity, file1, cost , no
+		FROM HOST_ROOM
+		WHERE addr LIKE '%${addr}%' AND capacity >= '${capacity}' AND cost BETWEEN '${min}' AND '${max}'
+				AND NO NOT IN (SELECT NO 
+								FROM OPTION_AMENITY oa
+								WHERE 	KITCHEN = '${kitchen}' 
+									AND LAUNDRY = '${laundry}'
+									<![CDATA[ AND COUNT_BED <= '${count_bed}']]>
+									AND WIFI = '${wifi}' 
+									AND AIRCONDITIONER = '${airconditioner}'
+									AND FREE_PARKING = '${free_parking}'
+									AND BBQ_GRILL = '${bbq_grill}'
+									<![CDATA[AND COUNT_BATH <= '${count_bath}']]>
+									AND SHOWER_SUPPLIES = '${shower_supplies}'
+									AND COOKING_ITEM = '${cooking_item}'
+									AND tv = '${tv}'
+									AND OTT = '${ott}'
+									AND AVAILABLE_SMOKING = '${available_smoking}'
+									AND AVAILABLE_PET = '${available_pet}'
+				)
+			AND NO NOT IN ( select no
+		                    from (  select * 
+		                        from option_cal o
+		                        where 1 = 1
+		                        and to_date('${check_in}', 'YYYY-MM-DD') between o.date_start and o.date_end
+		                        or to_date('${check_out}', 'YYYY-MM-DD') between o.date_start and o.date_end)
+		                    where status like '0')
+		    AND NO NOT IN (SELECT NO
+						   FROM (SELECT * 
+								 FROM BOOKING 
+								 WHERE 1 = 1
+								 AND TO_DATE('${check_in}','YYYY-MM-DD') BETWEEN CHECK_IN AND CHECK_OUT
+								 or TO_DATE('${check_out}','YYYY-MM-DD') BETWEEN CHECK_IN AND CHECK_OUT)
+							)
+</select>
+
+<select id = "getDetailPage" resultType = "kr.or.pause.dto.DetailPage">
+	SELECT *
+	FROM V_DETAIL_PAGE
+	WHERE NO = #{no}
+</select>
+	
+</mapper>

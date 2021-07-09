@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "kr.or.pause.login.JoinDao">
+
+
+<!-- 자체 회원 가입  -->
+<insert id="insert" parameterType="kr.or.pause.dto.PauseMember">
+	 <selectKey keyProperty="tagnumber" resultType="int" order="BEFORE">
+		SELECT M_TAGNUMBER.nextval FROM DUAL
+	</selectKey> 
+
+	INSERT INTO MEMBER (TAGNUMBER , PHONE_NUMBER , EMAIL , NAME , PASSWORD , COUPON ,ENABLED,TYPE_NO)
+	VALUES(#{tagnumber} , #{phone_number} , #{email} , #{name}, #{password}, 1, 1 ,1)
+
+</insert>
+
+<!-- 중복된 휴대폰 번호 방지-->
+<select id="phoneCheck" resultType="int">
+
+	SELECT COUNT(*) FROM MEMBER WHERE PHONE_NUMBER = #{phone_number}
+
+</select>
+
+<!-- 회원 정보 불러 오기 -->
+<select id="getPauseMember" resultType="kr.or.pause.dto.PauseMember">
+
+	SELECT PHONE_NUMBER , EMAIL , NAME , PASSWORD , PROFILE_IMG FROM MEMBER WHERE PHONE_NUMBER = #{phone_number}
+
+</select>
+
+<!-- 이름 수정 -->
+<update id="updateName">
+
+	UPDATE MEMBER
+	
+	SET PHONE_NUMBER = #{phone_number} , PASSWORD = #{password} , EMAIL = #{email}
+	
+	WHERE PHONE_NUMBER = #{phone_number}
+
+</update>
+
+</mapper>
